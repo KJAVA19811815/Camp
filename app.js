@@ -3,6 +3,7 @@ const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const Campground = require('./models/campgrounds')
+const Comment = require('./models/comment')
 const seedDB = require('./seeds');
 
 seedDB();
@@ -12,17 +13,6 @@ mongoose.connect("mongodb://localhost/yelp_camp");
 var app = express();
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({extended: true}));
-// Campground.create({
-//   name: 'Hogwarts',
-//   image: 'https://images.pottermore.com/bxd3o8b291gf/2phT56DSucuUqU6Icm6mCe/b1fd2811691e41ffd1622a07eb528604/HogwartsCastle_WB_F4_HogwartsThroughTheTrees_Illust_100615_Land.jpg?w=1200',
-//   description: 'A magical castle where you can live for 7 years, with magical creatures'
-// }, function(err, campground){
-//   if(err) {
-//     console.log("there was an error")
-//   } else {
-//     console.log(campground);
-//   }
-// })
 
 app.get('/', (req, res) => {
   res.render('landing')
@@ -33,24 +23,58 @@ app.get('/campgrounds', (req, res) => {
     if(err) {
       console.log("error")
     } else {
-      res.render("index", {campgrounds: allCampgrounds})
+      res.render("campgrounds/index", {campgrounds: allCampgrounds})
     }
   })
 });
 
 app.get('/campgrounds/new',(req, res) => {
-  res.render('new.ejs')
+  res.render('campgrounds/new.ejs')
 });
 
 app.get('/campgrounds/:id', (req, res) => {
-  Campground.findById(req.params.id, function(err, findCamp){
+  Campground.findById(req.params.id).populate("comments").exec(function(err, findCamp){
     if(err) {
       console.log("error")
     } else {
-      res.render("show",{campground: findCamp})
+      console.log(findCamp);
+      res.render("campgrounds/show",{campground: findCamp})
     }
   })
 });
+
+//COMMENTS ROUTES
+
+app.get('/campgrounds/:id/comments/new', (req, res) => {
+  Campground.findById(req.params.id, function(err, campground){
+    if(err){
+      console.log("err")
+    } else {
+      res.render("comments/new", {campground: campground});
+    }
+  })
+})
+
+app.post('/campgrounds/:id/comments', (req,res) => {
+  Campground.findById(req.params.id, function(err, campground){
+    if(err){
+      console.log(err);
+      res.redirect('/campgrounds')
+    } else {
+      console.log(req.body.comment);
+      Comment.create(req.body.comment, function(err, comment){
+        if(err){
+          console.log(err)
+        } else{
+          campground.comments.push(comment);
+          campground.save();
+          console.log(comment)
+          res.redirect('/campgrounds/' + campground._id);
+        }
+      })
+    }
+  })
+})
 
 app.post('/campgrounds', (req, res) => {
   // console.log(req.body.image);

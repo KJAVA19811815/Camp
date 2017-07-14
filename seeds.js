@@ -1,5 +1,6 @@
-var mongoose = require('mongoose');
-var Campground = require('./models/campgrounds');
+const mongoose = require('mongoose');
+const Campground = require('./models/campgrounds');
+const Comment = require('./models/comment');
 
 var data = [
   {
@@ -33,11 +34,25 @@ function seedDB(){
   });
 
   data.forEach(function(seed){
-    Campground.create(seed, function(err, data){
+    Campground.create(seed, function(err, campground){
       if(err){
         console.log("error")
       } else {
         console.log("data added")
+
+        Comment.create(
+          {
+            text: "this place is awsm",
+            author: "Peter quill"
+          }, function(err, comment){
+            if(err){
+              console.log("error");
+            } else {
+              campground.comments.push(comment);
+              campground.save();
+              console.log("success")
+            }
+          });
       }
     })
 
