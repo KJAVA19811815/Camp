@@ -1,18 +1,24 @@
-app.get('/', (req, res) => {
+const express = require('express');
+const router = express.Router();
+const User = require('../models/user');
+const passport = require('passport');
+
+
+router.get('/', (req, res) => {
   res.render('landing')
 })
 
 
 //AUTH ROUTES
-app.get('/register', (req,res) => {
+router.get('/register', (req,res) => {
     res.render('register');
 })
 
-app.get('/login', (req,res) => {
+router.get('/login', (req,res) => {
   res.render('login');
 });
 
-app.post('/register', (req,res) => {
+router.post('/register', (req,res) => {
   const newUser = new User({username: req.body.username});
   User.register(newUser, req.body.password, function(err, user){
     if(err){
@@ -27,14 +33,14 @@ app.post('/register', (req,res) => {
   })
 })
 
-app.post('/login', passport.authenticate('local', {
+router.post('/login', passport.authenticate('local', {
   successRedirect: '/campgrounds',
   faliureRedirect: 'login'
 }), (req,res) => {
 
 });
 
-app.get('/logout', (req,res) => {
+router.get('/logout', (req,res) => {
   req.logout();
   res.redirect('/campgrounds');
 })
@@ -45,3 +51,5 @@ function isLoggedIn(req, res, next){
   }
   res.redirect('/login')
 }
+
+module.exports = router;

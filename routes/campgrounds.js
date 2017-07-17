@@ -1,4 +1,9 @@
-app.get('/campgrounds', (req, res) => {
+const express = require('express');
+const router = express.Router();
+const Campground = require('../models/campgrounds');
+
+
+router.get('/campgrounds', (req, res) => {
   Campground.find({}, function(err, allCampgrounds){
     if(err) {
       console.log("error")
@@ -8,11 +13,11 @@ app.get('/campgrounds', (req, res) => {
   })
 });
 
-app.get('/campgrounds/new',(req, res) => {
+router.get('/campgrounds/new', isLoggedIn, (req, res) => {
   res.render('campgrounds/new.ejs')
 });
 
-app.get('/campgrounds/:id', (req, res) => {
+router.get('/campgrounds/:id', (req, res) => {
   Campground.findById(req.params.id).populate("comments").exec(function(err, findCamp){
     if(err) {
       console.log("error")
@@ -25,37 +30,7 @@ app.get('/campgrounds/:id', (req, res) => {
 
 //COMMENTS ROUTES
 
-app.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
-  Campground.findById(req.params.id, function(err, campground){
-    if(err){
-      console.log("err")
-    } else {
-      res.render("comments/new", {campground: campground});
-    }
-  })
-})
-
-app.post('/campgrounds/:id/comments', isLoggedIn, (req,res) => {
-  Campground.findById(req.params.id, function(err, campground){
-    if(err){
-      console.log(err);
-      res.redirect('/campgrounds')
-    } else {
-      console.log(req.body.comment);
-      Comment.create(req.body.comment, function(err, comment){
-        if(err){
-          console.log(err)
-        } else{
-          campground.comments.push(comment);
-          campground.save();
-          console.log(comment)
-          res.redirect('/campgrounds/' + campground._id);
-        }
-      })
-    }
-  })
-})
-app.post('/campgrounds', (req, res) => {
+router.post('/campgrounds', isLoggedIn, (req, res) => {
   var name = req.body.name;
   var image = req.body.image;
   var description = req.body.description;
@@ -70,3 +45,12 @@ app.post('/campgrounds', (req, res) => {
     }
   });
 })
+
+function isLoggedIn(req, res, next){
+  if(req.isAuthenticated()){
+    return next();
+  }
+  res.redirect('/login')
+}
+
+module.exports = router;
