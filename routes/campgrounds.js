@@ -30,13 +30,25 @@ router.get('/campgrounds/:id', (req, res) => {
 
 //edit
 router.get('/campgrounds/:id/edit', (req,res) => {
-  Campground.findById(req.params.id, function(err, foundCampground){
-    if(err){
-      console.log("error")
-    } else {
-      res.render('campgrounds/edit', {campground: foundCampground});
-    }
-  })
+  if(req.isAuthenticated()){
+    Campground.findById(req.params.id, function(err, foundCampground){
+      if(err){
+        console.log("error")
+      } else {
+        console.log("IIIDIDIDID " + foundCampground);
+        console.log("22222222 " + req.user._id)
+        if(foundCampground.author.id.equals(req.user._id)){
+          res.render('campgrounds/edit', {campground: foundCampground});
+
+        } else {
+          res.send("u dont have the permission")
+        }
+      }
+    })
+  } else {
+    console.log("plz log in")
+    res.send("plz log in")
+  }
 })
 
 router.put('/campgrounds/:id', (req,res) => {
