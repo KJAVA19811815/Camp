@@ -28,19 +28,55 @@ router.get('/campgrounds/:id', (req, res) => {
   })
 });
 
+//edit
+router.get('/campgrounds/:id/edit', (req,res) => {
+  Campground.findById(req.params.id, function(err, foundCampground){
+    if(err){
+      console.log("error")
+    } else {
+      res.render('campgrounds/edit', {campground: foundCampground});
+    }
+  })
+})
+
+router.put('/campgrounds/:id', (req,res) => {
+  Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
+    if(err){
+      res.redirect('/campgrounds')
+    } else {
+      res.redirect('/campgrounds/' + req.params.id)
+    }
+  })
+})
+
+router.delete('/campgrounds/:id', (req, res) => {
+  Campground.findByIdAndRemove(req.params.id, function(err){
+    if(err){
+      res.redirect('/campgrounds')
+    } else {
+      res.redirect('/campgrounds')
+    }
+  })
+})
+
 //COMMENTS ROUTES
 
 router.post('/campgrounds', isLoggedIn, (req, res) => {
   var name = req.body.name;
   var image = req.body.image;
   var description = req.body.description;
+  var author = {
+    id: req.user._id,
+    username: req.user.username
+  }
 
-  var newCampground = {name: name, image: image, description: description}
+  var newCampground = {name: name, image: image, description: description, author: author}
+  console.log(req.user);
   Campground.create(newCampground, function(err, newCampground) {
     if(err){
       console.log("error");
     } else {
-      console.log(newCampground);
+      console.log("HHOOOO " + newCampground);
       res.redirect('/campgrounds');
     }
   });
