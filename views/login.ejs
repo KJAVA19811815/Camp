@@ -1,10 +1,15 @@
 <% include ./partials/_header %>
 
 <h1><%= error %></h1>
-<form method="POST" action="login">
-  <input type="text" name="username" placeholder="username">
-  <input type="text" name="password" placeholder="password">
-  <button>LOGIN</button>
-</form>
+<div class="container2">
+  <div class="wrapper">
+    <h1>LOGIN</h1>
+    <form method="POST" action="login">
+      <input class="form-control" type="text" name="username" placeholder="username"></br>
+      <input class="form-control" type="text" name="password" placeholder="password"></br>
+      <button class="btn btn-reverse">LOGIN</button>
+    </form>
+  </div>
+</div>
 
 <% include ./partials/_footer %>

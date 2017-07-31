@@ -1,10 +1,14 @@
 <% include ./partials/_header %>
-<h1>REGISTER</h1>
 
-<form method="POST" action="/register">
-  <input type="text" name="username" placeholder="username">
-  <input type="text" name="password" placeholder="password">
-  <button>register</button>
-</form>
+<div class="container2">
+  <div class = "wrapper">
+    <h1>REGISTER</h1>
+    <form method="POST" action="/register">
+      <input class="form-control "type="text" name="username" placeholder="username"></br>
+      <input class="form-control" type="text" name="password" placeholder="password"></br>
+      <button class="btn btn-reverse">register</button>
+    </form>
+  </div>
+</div>
 
 <% include ./partials/_footer %>
